@@ -38,10 +38,19 @@ class UnsignedTransactionBuilderImpl(val _ctx: BlockchainContextImpl) extends Un
     this
   }
 
+  override def addInputs(boxes: util.List[InputBox]): UnsignedTransactionBuilder = {
+    val iterator = boxes.iterator()
+    while (iterator.hasNext) {
+      iterator.next() match {
+        case b: InputBoxImpl => _inputs.add(b)
+      }
+    }
+    this
+  }
+
   override def boxesToSpend(inputBoxes: List[InputBox]): UnsignedTransactionBuilder = {
     require(_inputs.isEmpty, "inputs already specified")
-    addInputs(JavaHelpers.toIndexedSeq(inputBoxes): _*)
-    this
+    addInputs(inputBoxes)
   }
 
   override def addDataInputs(boxes: InputBox*): UnsignedTransactionBuilder = {
@@ -53,7 +62,17 @@ class UnsignedTransactionBuilderImpl(val _ctx: BlockchainContextImpl) extends Un
 
   override def withDataInputs(inputBoxes: List[InputBox]): UnsignedTransactionBuilder = {
     require(_dataInputs.isEmpty, "dataInputs list is already specified")
-    addDataInputs(JavaHelpers.toIndexedSeq(inputBoxes): _*)
+    addDataInputs(inputBoxes)
+    this
+  }
+
+  override def addDataInputs(boxes: util.List[InputBox]): UnsignedTransactionBuilder = {
+    val iterator = boxes.iterator()
+    while (iterator.hasNext) {
+      iterator.next() match {
+        case b: InputBoxImpl => _dataInputs.add(b)
+      }
+    }
     this
   }
 
@@ -70,6 +89,16 @@ class UnsignedTransactionBuilderImpl(val _ctx: BlockchainContextImpl) extends Un
     this
   }
 
+  override def addOutputs(outBoxes: util.List[OutBox]): UnsignedTransactionBuilder = {
+    val iterator = outBoxes.iterator()
+    while (iterator.hasNext) {
+      iterator.next() match {
+        case b: OutBoxImpl => _outputs.add(b)
+      }
+    }
+    this
+  }
+
   override def fee(feeAmount: Long): UnsignedTransactionBuilder = {
     require(_feeAmount.isEmpty, "Fee already defined")
     _feeAmount = Some(feeAmount)
@@ -83,6 +112,12 @@ class UnsignedTransactionBuilderImpl(val _ctx: BlockchainContextImpl) extends Un
       Collections.addAll(res, tokens: _*)
       res
     })
+    this
+  }
+
+  override def tokensToBurn(tokens: util.List[ErgoToken]): UnsignedTransactionBuilder = {
+    require(_tokensToBurn.isEmpty, "Tokens to burn already specified.")
+    _tokensToBurn = Some(new util.ArrayList[ErgoToken](tokens))
     this
   }
 
