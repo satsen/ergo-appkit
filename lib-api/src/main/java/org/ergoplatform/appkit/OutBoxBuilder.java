@@ -2,6 +2,9 @@ package org.ergoplatform.appkit;
 
 import org.ergoplatform.SigmaConstants;
 import org.ergoplatform.sdk.ErgoToken;
+import sigmastate.SInt;
+
+import java.util.List;
 
 /**
  * This interface is used to build a new output box, which can be included
@@ -34,11 +37,22 @@ public interface OutBoxBuilder {
      *
      * @param tokens one or more tokens to be added to the constructed output box.
      * @see ErgoToken
+     * @deprecated Use {@link #tokens(List)} instead.
      */
+    @Deprecated
     OutBoxBuilder tokens(ErgoToken... tokens);
 
     /**
-     * Mints new token according to https://github.com/ergoplatform/eips/blob/master/eip-0004.md
+     * Configures amounts for tokens (up to {@link SigmaConstants.MaxTokens}).
+     * Each Ergo box can store zero or more tokens (aka assets).
+     *
+     * @param tokens tokens to be added to the constructed output box.
+     * @see ErgoToken
+     */
+    OutBoxBuilder tokens(List<ErgoToken> tokens);
+
+    /**
+     * Mints new token according to <a href="https://github.com/ergoplatform/eips/blob/master/eip-0004.md">EIP-0004</a>
      *
      * @param token token to mint
      * @see Eip4Token and Eip4TokenBuilder
@@ -57,6 +71,10 @@ public interface OutBoxBuilder {
      * @see org.ergoplatform.ErgoBox.NonMandatoryRegisterId
      */
     OutBoxBuilder registers(ErgoValue<?>... registers);
+
+    default OutBoxBuilder registers(List<ErgoValue<?>> registers) {
+        return registers(registers.toArray(new ErgoValue<?>[0]));
+    }
 
     /**
      * Configure the height when the transaction containing the box was created.

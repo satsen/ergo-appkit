@@ -32,6 +32,16 @@ class OutBoxBuilderImpl(_txB: UnsignedTransactionBuilderImpl) extends OutBoxBuil
     this
   }
 
+  override def tokens(tokens: java.util.List[ErgoToken]): OutBoxBuilderImpl = {
+    val maxTokens = SigmaConstants.MaxTokens.value
+    require(tokens.size <= maxTokens, SigmaConstants.MaxTokens.description + s": $maxTokens")
+    val iterator = tokens.iterator()
+    while (iterator.hasNext) {
+      _tokens += iterator.next
+    }
+    this
+  }
+
   override def mintToken(token: Eip4Token): OutBoxBuilder = {
     val tokenNameVal = token.getMintingBoxR4
     val tokenDescVal = token.getMintingBoxR5
